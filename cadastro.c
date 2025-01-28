@@ -3,8 +3,6 @@
 #include"cadastro.h"
 #include<locale.h>
 
-
-
 int count_pecas=0,count_fornecedor=0,count_servico=0,count_clientes=0,count_oficina=0,count_veiculo=0,count_funcionario=0;//contagem de variaveis iniciadas em 0
 int typedoc;
 //definição das extern em null
@@ -16,8 +14,7 @@ FORNECEDOR *fornecedores = NULL;
 FUNCIONARIO *funcionarios = NULL;
 SERVICO *servicos = NULL;
 /*==========================================================
-proprietário para veiculo,validar cliente
-exlusao cliente
+//arrumar comissao da ordem
 ============================================================*/
 
 /*
@@ -65,6 +62,15 @@ int tipo_doc() {
     remove(typedoc == 1 ? "fornecedor.bin" : "fornecedor.txt");
     remove(typedoc == 1 ? "servico.bin" : "servico.txt");
     remove(typedoc == 1 ? "funcionario.bin" : "funcionario.txt");
+    remove(typedoc == 1 ? "transacoes.bin" : "transacoes.txt");
+    remove(typedoc == 1 ? "recebimentos.bin" : "recebimentos.txt");
+    remove(typedoc == 1 ? "pagamentos.bin" : "pagamentos.txt");
+    remove(typedoc == 1 ? "fiscal.bin" : "fiscal.txt");
+    remove(typedoc == 1 ? "caixa.bin" : "caixa.txt");
+
+
+
+    //transaçao recebimento pagamento fical caixa
     system("cls");
     return typedoc;
 }
@@ -190,6 +196,86 @@ void inicializa_arquivos() {
     } else {
         fclose(arquivo);
     }
+
+    arquivo = fopen("transacoes.txt", "r");//transações
+    if (arquivo == NULL) {
+        arquivo = fopen("transacoes.txt", "w");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("transacoes.bin", "rb");//transações
+    if (arquivo == NULL) {
+        arquivo = fopen("transacoes.bin", "wb");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("recebimentos.txt", "r");//recebimentos
+    if (arquivo == NULL) {
+        arquivo = fopen("recebimentos.txt", "w");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("recebimentos.bin", "rb");//recebimentos
+    if (arquivo == NULL) {
+        arquivo = fopen("recebimentos.bin", "wb");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("pagamentos.txt", "r");//pagamentos
+    if (arquivo == NULL) {
+        arquivo = fopen("pagamentos.txt", "w");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("pagamentos.bin", "rb");//pagamentos
+    if (arquivo == NULL) {
+        arquivo = fopen("pagamentos.bin", "wb");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("fiscal.txt", "r");//fiscal
+    if (arquivo == NULL) {
+        arquivo = fopen("fiscal.txt", "w");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("fiscal.bin", "rb");//fiscal
+    if (arquivo == NULL) {
+        arquivo = fopen("fiscal.bin", "wb");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("caixa.txt", "r");//caixa
+    if (arquivo == NULL) {
+        arquivo = fopen("caixa.txt", "w");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
+
+    arquivo = fopen("caixa.bin", "rb");//caixa
+    if (arquivo == NULL) {
+        arquivo = fopen("caixa.bin", "wb");
+        fclose(arquivo);
+    } else {
+        fclose(arquivo);
+    }
 }
 
 void finalizar_dados() {
@@ -311,15 +397,15 @@ int troca(){
     // Lê do formato atual e escreve no novo formato
     if (typedoc == 1) {  // De texto para binário
         VEICULOS v;
-         while (fscanf(veiculoO, "%29[^,],%49[^,],%49[^,],%d,%19[^\n]",
-                      v.placa, v.modelo, v.marca, &v.anof, v.chassi) == 5) {
+         while (fscanf(veiculoO, "%29[^,],%49[^,],%49[^,],%d,%19[^,],%19[^\n]",
+                      v.placa, v.modelo, v.marca, &v.anof, v.chassi, v.ptt) == 6) {
             fwrite(&v, sizeof(VEICULOS), 1, veiculoD);
         }
     } else {  // De binário para texto
         VEICULOS v;
         while (fread(&v, sizeof(VEICULOS), 1, veiculoO) == 1) {
-            fprintf(veiculoD, "%s,%s,%s,%d,%s",
-                      v.placa, v.modelo, v.marca, &v.anof, v.chassi);
+            fprintf(veiculoD, "%s,%s,%s,%d,%s,%s\n",
+                      v.placa, v.modelo, v.marca, &v.anof, v.chassi, v.ptt);
         }
     }
 
@@ -385,7 +471,7 @@ int troca(){
         FORNECEDOR f;
         while (fread(&f, sizeof(FORNECEDOR), 1, fornecedorO) == 1) {
             fprintf(fornecedorD, "%d,%s,%s,%s,%s,%s,%s,%s\n",//adicionado o [^\n] pois ultima leitura é uma string
-                      &f.codigo, f.nome_fantasia, f.razao_social, f.inscricao_est,
+                      f.codigo, f.nome_fantasia, f.razao_social, f.inscricao_est,
                       f.cnpj, f.endereco, f.telefone, f.email);
         }
     }
@@ -417,7 +503,7 @@ int troca(){
         SERVICO s;
         while (fread(&s, sizeof(SERVICO), 1, servicosO) == 1) {
             fprintf(servicosD, "%d,%s,%f,%f\n",
-                      &s.codigo, s.descricao, &s.preco, &s.comissao);
+                      s.codigo, s.descricao, &s.preco, &s.comissao);
         }
     }
 
@@ -427,7 +513,7 @@ int troca(){
     // Remove o arquivo do formato antigo
     remove(typedoc == 1 ? "servico.txt" : "servico.bin");
 //==========================================================================================================
-//abrindo arquivos fornecedor
+//abrindo arquivos funcionario
     FILE *funcionarioO = fopen(typedoc == 1 ? "funcionario.txt" : "funcionario.bin", typedoc == 1 ? "r" : "rb");
     FILE *funcionarioD = fopen(novo_typedoc == 1 ? "funcionario.txt" : "funcionario.bin", novo_typedoc == 1 ? "w" : "wb");
 
@@ -458,6 +544,152 @@ int troca(){
     // Remove o arquivo do formato antigo
     remove(typedoc == 1 ? "funcionario.txt" : "funcionario.bin");
 //==========================================================================================================
+// Abrindo arquivos transações
+FILE *trO = fopen(typedoc == 1 ? "transacoes.txt" : "transacoes.bin", typedoc == 1 ? "r" : "rb");
+FILE *trD = fopen(novo_typedoc == 1 ? "transacoes.txt" : "transacoes.bin", novo_typedoc == 1 ? "w" : "wb");
+
+if (!trO || !trD) {
+    if (trO) fclose(trO);
+    if (trD) fclose(trD);
+    return -2; // Erro de abertura
+}
+
+// Lê do formato atual e escreve no novo formato
+if (typedoc == 1) {  // De texto para binário
+    CAIXA c;
+    while (fscanf(trO, "%f,%49[^,],%19[^\n]\n", &c.saldo, c.descricao, c.data) == 3) {
+        fwrite(&c, sizeof(CAIXA), 1, trD);
+    }
+} else {  // De binário para texto
+    CAIXA c;
+    while (fread(&c, sizeof(CAIXA), 1, trO) == 1) {
+        fprintf(trD, "%.2f,%s,%s\n", c.saldo, c.descricao, c.data);
+    }
+}
+
+fclose(trO);
+fclose(trD);
+
+// Remove o arquivo do formato antigo
+remove(typedoc == 1 ? "transacoes.txt" : "transacoes.bin");
+//==========================================================================================================
+// Abrindo arquivos recebimentos
+FILE *recO = fopen(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin", typedoc == 1 ? "r" : "rb");
+FILE *recD = fopen(novo_typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin", novo_typedoc == 1 ? "w" : "wb");
+
+if (!recO || !recD) {
+    if (recO) fclose(recO);
+    if (recD) fclose(recD);
+    return -2; // Erro de abertura
+}
+
+// Lê do formato atual e escreve no novo formato
+if (typedoc == 1) {  // De texto para binário
+    CONTASR r;
+    while (fscanf(recO, "%49[^,],%f,%14[^\n],%d\n", r.descricao, &r.valor, r.data_vencimento, &r.status) == 4) {
+        fwrite(&r, sizeof(CONTASR), 1, recD);
+    }
+} else {  // De binário para texto
+    CONTASR r;
+    while (fread(&r, sizeof(CONTASR), 1, recO) == 1) {
+        fprintf(recD, "%s,%.2f,%s,%d\n", r.descricao, r.valor, r.data_vencimento, r.status);
+    }
+}
+
+fclose(recO);
+fclose(recD);
+
+// Remove o arquivo do formato antigo
+remove(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin");
+//==========================================================================================================
+
+// Abrindo arquivos pagamentos
+FILE *pagO = fopen(typedoc == 1 ? "pagamentos.txt" : "pagamentos.bin", typedoc == 1 ? "r" : "rb");
+FILE *pagD = fopen(novo_typedoc == 1 ? "pagamentos.txt" : "pagamentos.bin", novo_typedoc == 1 ? "w" : "wb");
+
+if (!pagO || !pagD) {
+    if (pagO) fclose(pagO);
+    if (pagD) fclose(pagD);
+    return -2; // Erro de abertura
+}
+
+// Lê do formato atual e escreve no novo formato
+if (typedoc == 1) {  // De texto para binário
+    CONTASP p;
+    while (fscanf(pagO, "%49[^,],%f,%14[^,],%d\n", p.descricao, &p.valor, p.data_vencimento, &p.status) == 4) {
+        fwrite(&p, sizeof(CONTASP), 1, pagD);
+    }
+} else {  // De binário para texto
+    CONTASP p;
+    while (fread(&p, sizeof(CONTASP), 1, pagO) == 1) {
+        fprintf(pagD, "%s,%.2f,%s,%d\n", p.descricao, p.valor, p.data_vencimento, p.status);
+    }
+}
+
+fclose(pagO);
+fclose(pagD);
+
+// Remove o arquivo do formato antigo
+remove(typedoc == 1 ? "pagamentos.txt" : "pagamentos.bin");
+//==========================================================================================================
+// Abrindo arquivos fiscal
+FILE *fisO = fopen(typedoc == 1 ? "fiscal.txt" : "fiscal.bin", typedoc == 1 ? "r" : "rb");
+FILE *fisD = fopen(novo_typedoc == 1 ? "fiscal.txt" : "fiscal.bin", novo_typedoc == 1 ? "w" : "wb");
+
+if (!fisO || !fisD) {
+    if (fisO) fclose(fisO);
+    if (fisD) fclose(fisD);
+    return -2; // Erro de abertura
+}
+
+// Lê do formato atual e escreve no novo formato
+if (typedoc == 1) {  // De texto para binário
+    PECA f;
+    while (fscanf(fisO, "%49[^,],%d,%f\n", f.descricao, &f.qntd_estoque, &f.p_venda) == 3) {
+        fwrite(&f, sizeof(PECA), 1, fisD);
+    }
+} else {  // De binário para texto
+    PECA f;
+    while (fread(&f, sizeof(PECA), 1, fisO) == 1) {
+        fprintf(fisD, "%s,%d,%.2f\n", f.descricao, f.qntd_estoque, f.p_venda);
+    }
+}
+
+fclose(fisO);
+fclose(fisD);
+
+// Remove o arquivo do formato antigo
+remove(typedoc == 1 ? "fiscal.txt" : "fiscal.bin");
+//==========================================================================================================
+// Abrindo arquivos caixa
+FILE *caiO = fopen(typedoc == 1 ? "caixa.txt" : "caixa.bin", typedoc == 1 ? "r" : "rb");
+FILE *caiD = fopen(novo_typedoc == 1 ? "caixa.txt" : "caixa.bin", novo_typedoc == 1 ? "w" : "wb");
+
+if (!caiO || !caiD) {
+    if (caiO) fclose(caiO);
+    if (caiD) fclose(caiD);
+    return -2; // Erro de abertura
+}
+
+// Lê do formato atual e escreve no novo formato
+if (typedoc == 1) {  // De texto para binário
+    CAIXA c;
+    while (fscanf(caiO, "%f,%49[^,],%19[^\n]\n", &c.saldo, c.descricao, c.data) == 3) {
+        fwrite(&c, sizeof(CAIXA), 1, caiD);
+    }
+} else {  // De binário para texto
+    CAIXA c;
+    while (fread(&c, sizeof(CAIXA), 1, caiO) == 1) {
+        fprintf(caiD, "%.2f,%s,%s\n", c.saldo, c.descricao, c.data);
+    }
+}
+
+fclose(caiO);
+fclose(caiD);
+
+// Remove o arquivo do formato antigo
+remove(typedoc == 1 ? "caixa.txt" : "caixa.bin");
+//==========================================================================================================
     typedoc = novo_typedoc;
     FILE *tipodoc = fopen("typedoc.txt","w");
     if(tipodoc){
@@ -466,6 +698,7 @@ int troca(){
         fclose(tipodoc);
         return -2;
     }
+
     fclose(tipodoc);
     return 0;
 }
@@ -1380,7 +1613,7 @@ int cadastro_servico() {
         printf("Preço: ");
         scanf("%f", &s->preco);
 //================================================================================================
-        printf("Comissão: ");
+        printf("%% de Comissão: ");
         scanf("%f", &s->comissao);
         getchar();  // Limpa o buffer
 //================================================================================================
@@ -3767,7 +4000,7 @@ int alterar_funcionario() {
 }
 
 // Entrada da nota fiscal
-void entrada_nota_fiscal() {
+int entrada_nota_fiscal() {
     char cnpj[20],fornecedor[50];
     float frete_total, imposto_total,margem_lucro,lucrotot,p_venda;
     int num_produtos,found,x,totquant;
@@ -4009,10 +4242,6 @@ int apply_fiscal() {
                 fprintf(temp_file, "%d,%s,%s,%s,%.2f,%.2f,%d,%d\n",
                         p.codigo, p.descricao, p.fabricante, p.fornecedor,
                         p.p_custo, p.p_venda, p.qntd_estoque, p.qntd_minima);
-
-                if (!updated) {
-                        pna(p.descricao);
-                }
             }
         }
     } else {  // Modo binário
@@ -4163,7 +4392,7 @@ int registrar_conta_receber() {
     scanf("%f", &c.valor);
     getchar();
 
-    FILE *contasr_file = fopen(typedoc == 1 ? "contasr.txt" : "contasr.bin", typedoc == 1 ? "a" : "ab");
+    FILE *contasr_file = fopen(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin", typedoc == 1 ? "a" : "ab");
     if (!contasr_file) return -2;
 
     if (typedoc == 1) {
@@ -4178,7 +4407,7 @@ int registrar_conta_receber() {
 }
 
 int consultar_contas_receber() {
-    FILE *contasr_file = fopen(typedoc == 1 ? "contasr.txt" : "contasr.bin", typedoc == 1 ? "r" : "rb");
+    FILE *contasr_file = fopen(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin", typedoc == 1 ? "r" : "rb");
     if (!contasr_file) return -2;
 
     if (typedoc == 1) {//modo texto
@@ -4206,7 +4435,7 @@ int baixar_conta_receber() {
     fgets(descricao, sizeof(descricao), stdin);
     strtok(descricao, "\n");
 
-    FILE *contasr_file = fopen(typedoc == 1 ? "contasr.txt" : "contasr.bin", typedoc == 1 ? "r" : "rb");
+    FILE *contasr_file = fopen(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin", typedoc == 1 ? "r" : "rb");
     FILE *temp_file = fopen(typedoc == 1 ? "temp.txt" : "temp.bin", typedoc == 1 ? "w" : "wb"); // Arquivo temporário
     if (!contasr_file || !temp_file) return -2;
 
@@ -4242,8 +4471,8 @@ int baixar_conta_receber() {
     fclose(contasr_file);
     fclose(temp_file);
 
-    remove(typedoc == 1 ? "contasr.txt" : "contasr.bin");
-    rename(typedoc == 1 ? "temp.txt" : "temp.bin", typedoc == 1 ? "contasr.txt" : "contasr.bin");
+    remove(typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin");
+    rename(typedoc == 1 ? "temp.txt" : "temp.bin", typedoc == 1 ? "recebimentos.txt" : "recebimentos.bin");
 
     if (encontrado) {
         // Adicionar a transação ao caixa
@@ -4266,6 +4495,7 @@ int baixar_conta_receber() {
         return 1;
     }
 }
+
 
 int registrar_conta_pagar() {
     char descricao[50], data_vencimento[11];
@@ -4301,7 +4531,6 @@ int registrar_conta_pagar() {
     return 0;
 }
 
-// Consultar contas a pagar
 int consultar_contas_pagar() {
     FILE *contasp_file = fopen(typedoc == 1 ? "pagamentos.txt" : "pagamentos.bin", typedoc == 1 ? "r" : "rb");
     if (!contasp_file) return -2;
@@ -4328,7 +4557,6 @@ int consultar_contas_pagar() {
     return 0;
 }
 
-// Baixar uma conta a pagar
 int baixar_conta_pagar() {
     char descricao[50];
     printf("Digite a descrição da conta a ser baixada: ");
@@ -4398,3 +4626,621 @@ int baixar_conta_pagar() {
 
     return encontrado ? 0 : 1;
 }
+
+//agendamentos
+
+int verificar_concorrencia(char *cpf_funcionario, char *data, char *hora) {
+    FILE *arquivo = fopen(typedoc == 1 ? "agendamento.txt" : "agendamento.bin", typedoc == 1 ? "r" : "rb");
+    if (!arquivo) {
+        perror("Erro ao abrir arquivo de agendamentos");
+        return -1; // Erro ao abrir o arquivo
+    }
+
+    AGENDAMENTO a;
+    int conflito = 0;
+
+    if (typedoc == 1) { // Modo texto
+        while (fscanf(arquivo, "%d,%19[^,],%d,%19[^,],%19[^,],%19[^,],%d,%d\n",
+                      &a.codigocliente, a.placaveiculo, &a.servico, a.data, a.hora, a.cpf, &a.peca, &a.qntd_pecas) == 8) {
+            if (strcmp(a.cpf, cpf_funcionario) == 0 &&
+                strcmp(a.data, data) == 0 &&
+                strcmp(a.hora, hora) == 0) {
+                conflito = 1; // Conflito encontrado
+                break;
+            }
+        }
+    } else { // Modo binário
+        while (fread(&a, sizeof(AGENDAMENTO), 1, arquivo) == 1) {
+            if (strcmp(a.cpf, cpf_funcionario) == 0 &&
+                strcmp(a.data, data) == 0 &&
+                strcmp(a.hora, hora) == 0) {
+                conflito = 1; // Conflito encontrado
+                break;
+            }
+        }
+    }
+
+    fclose(arquivo);
+    return conflito;
+}
+
+int debitar_estoque(int codigo_peca, int quantidade) {
+    FILE *pecas = fopen(typedoc == 1 ? "pecas.txt" : "pecas.bin", "r");
+    if (!pecas) {
+        perror("Erro ao abrir arquivo de peças");
+        return -1;
+    }
+
+    FILE *temp = fopen(typedoc == 1 ? "pecas_temp.txt" : "pecas_temp.bin", "w");
+    if (!temp) {
+        perror("Erro ao criar arquivo temporário");
+        fclose(pecas);
+        return -1;
+    }
+
+    int codigo, estoque_atual, estoque_minimo;
+    char descricao[50], fabricante[30], fornecedor[30];
+    float preco_custo, preco_venda;
+
+    int encontrado = 0;
+    while (typedoc == 1
+           ? fscanf(pecas, "%d,%49[^,],%29[^,],%29[^,],%f,%f,%d,%d\n",
+                    &codigo, descricao, fabricante, fornecedor,
+                    &preco_custo, &preco_venda, &estoque_atual, &estoque_minimo) == 8
+           : fread(&codigo, sizeof(int), 1, pecas) &&
+             fread(&descricao, sizeof(descricao), 1, pecas) &&
+             fread(&estoque_atual, sizeof(int), 1, pecas)) {
+        if (codigo == codigo_peca) {
+            encontrado = 1;
+            if (estoque_atual < quantidade) {
+                printf("Erro: Estoque insuficiente para a peça %d. Disponível: %d, Necessário: %d\n",
+                       codigo_peca, estoque_atual, quantidade);
+                fclose(pecas);
+                fclose(temp);
+                remove(typedoc == 1 ? "pecas_temp.txt" : "pecas_temp.bin");
+                return -2; // Estoque insuficiente
+            }
+            estoque_atual -= quantidade;
+        }
+
+        if (typedoc == 1) {
+            fprintf(temp, "%d,%s,%s,%s,%.2f,%.2f,%d,%d\n",
+                    codigo, descricao, fabricante, fornecedor,
+                    preco_custo, preco_venda, estoque_atual, estoque_minimo);
+        } else {
+            fwrite(&codigo, sizeof(int), 1, temp);
+            fwrite(&descricao, sizeof(descricao), 1, temp);
+            fwrite(&estoque_atual, sizeof(int), 1, temp);
+        }
+    }
+
+    fclose(pecas);
+    fclose(temp);
+
+    if (!encontrado) {
+        printf("Erro: Peça %d não encontrada no estoque.\n", codigo_peca);
+        remove(typedoc == 1 ? "pecas_temp.txt" : "pecas_temp.bin");
+        return -3; // Peça não encontrada
+    }
+
+    // Substituir o arquivo original pelo temporário
+    remove(typedoc == 1 ? "pecas.txt" : "pecas.bin");
+    rename(typedoc == 1 ? "pecas_temp.txt" : "pecas_temp.bin", typedoc == 1 ? "pecas.txt" : "pecas.bin");
+    return 0; // Sucesso
+}
+
+int agendamento() {
+    AGENDAMENTO a = {0};
+    int encontrado = 0;
+
+    // Abrir o arquivo de agendamentos para leitura
+    FILE *agendamento_file = fopen(typedoc == 1 ? "agendamento.txt" : "agendamento.bin", typedoc == 1 ? "r" : "rb");
+    if (!agendamento_file) {
+        perror("Erro ao abrir arquivo de agendamentos para leitura");
+        return -2;
+    }
+
+    // Verificar o maior código
+    int codigo, mc = 0; // Inicializa o maior código com 0
+    if (typedoc == 1) { // Arquivo texto
+        while (fscanf(agendamento_file, "%d,%*d,%*[^,],%*d,%*[^,],%*[^,],%*[^,],%*d,%*d\n", &codigo) == 1) {
+            if (codigo > mc) mc = codigo;
+        }
+    } else { // Arquivo binário
+        AGENDAMENTO temp;
+        while (fread(&temp, sizeof(AGENDAMENTO), 1, agendamento_file) == 1) {
+            if (temp.codigo > mc) mc = temp.codigo;
+        }
+    }
+    fclose(agendamento_file); // Fechar o arquivo após leitura
+    a.codigo = mc + 1; // Define o próximo código disponível
+
+    // Validação do cliente
+    FILE *cliente_file = fopen(typedoc == 1 ? "cliente.txt" : "cliente.bin", typedoc == 1 ? "r" : "rb");
+    if (!cliente_file) {
+        perror("Erro ao abrir arquivo de clientes");
+        return -2;
+    }
+
+    printf("Novo Agendamento:\n");
+    printf("Código do cliente:\n");
+    scanf("%d", &a.codigocliente);
+    getchar();
+
+    if (typedoc == 1) {
+        while (fscanf(cliente_file, "%d,%*[^,],%*[^,],%*[^,],%*[^,],%*[^\n]\n", &codigo) == 1) {
+            if (codigo == a.codigocliente) {
+                encontrado = 1;
+                break;
+            }
+        }
+    } else {
+        CLIENTE cli;
+        while (fread(&cli, sizeof(CLIENTE), 1, cliente_file) == 1) {
+            if (cli.codigo == a.codigocliente) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
+    fclose(cliente_file);
+
+    if (!encontrado) {
+        printf("Cliente não encontrado.\n");
+        return -1;
+    }
+
+    // Validação do veículo
+    FILE *veiculo_file = fopen(typedoc == 1 ? "veiculo.txt" : "veiculo.bin", typedoc == 1 ? "r" : "rb");
+    if (!veiculo_file) {
+        perror("Erro ao abrir arquivo de veículos");
+        return -2;
+    }
+
+    printf("Placa do veículo:\n");
+    fgets(a.placaveiculo, sizeof(a.placaveiculo), stdin);
+    strtok(a.placaveiculo, "\n");
+
+    encontrado = 0;
+    if (typedoc == 1) {
+        char placa[30];
+        while (fscanf(veiculo_file, "%29[^,],%*[^,],%*[^,],%*d,%*[^,],%*[^\n]\n", placa) == 1) {
+            if (strcmp(placa, a.placaveiculo) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+    } else {
+        VEICULOS vei;
+        while (fread(&vei, sizeof(VEICULOS), 1, veiculo_file) == 1) {
+            if (strcmp(vei.placa, a.placaveiculo) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
+    fclose(veiculo_file);
+
+    if (!encontrado) {
+        printf("Veículo não encontrado.\n");
+        return -1;
+    }
+
+    // Validação do serviço
+    FILE *servico_file = fopen(typedoc == 1 ? "servico.txt" : "servico.bin", typedoc == 1 ? "r" : "rb");
+    if (!servico_file) {
+        perror("Erro ao abrir arquivo de serviços");
+        return -2;
+    }
+
+    printf("Código do serviço:\n");
+    scanf("%d", &a.servico);
+    getchar();
+
+    encontrado = 0;
+    if (typedoc == 1) {
+        while (fscanf(servico_file, "%d,%*[^,],%*f,%*f\n", &codigo) == 1) {
+            if (codigo == a.servico) {
+                encontrado = 1;
+                break;
+            }
+        }
+    } else {
+        SERVICO ser;
+        while (fread(&ser, sizeof(SERVICO), 1, servico_file) == 1) {
+            if (ser.codigo == a.servico) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
+    fclose(servico_file);
+
+    if (!encontrado) {
+        printf("Serviço não encontrado.\n");
+        return -1;
+    }
+
+    // Validação do funcionário
+    FILE *funcionario_file = fopen(typedoc == 1 ? "funcionario.txt" : "funcionario.bin", typedoc == 1 ? "r" : "rb");
+    if (!funcionario_file) {
+        perror("Erro ao abrir arquivo de funcionários");
+        return -2;
+    }
+
+    printf("CPF do funcionário:\n");
+    fgets(a.cpf, sizeof(a.cpf), stdin);
+    strtok(a.cpf, "\n");
+
+    encontrado = 0;
+    if (typedoc == 1) {
+        char cpf[20];
+        while (fscanf(funcionario_file, "%*[^,],%19[^,],%*[^,],%*f\n", cpf) == 1) {
+            if (strcmp(cpf, a.cpf) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+    } else {
+        FUNCIONARIO func;
+        while (fread(&func, sizeof(FUNCIONARIO), 1, funcionario_file) == 1) {
+            if (strcmp(func.cpf, a.cpf) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
+    fclose(funcionario_file);
+
+    if (!encontrado) {
+        printf("Funcionário não encontrado.\n");
+        return -1;
+    }
+
+    // Validação de data e hora
+    printf("Data (DD/MM/AAAA):\n");
+    fgets(a.data, sizeof(a.data), stdin);
+    strtok(a.data, "\n");
+
+    printf("Hora (HH:MM):\n");
+    fgets(a.hora, sizeof(a.hora), stdin);
+    strtok(a.hora, "\n");
+
+    if (verificar_concorrencia(a.cpf, a.data, a.hora)) {
+        printf("Erro: Já existe um agendamento para este horário.\n");
+        return -1;
+    }
+
+    // Validação de peça
+    printf("Código da peça utilizada:\n");
+    scanf("%d", &a.peca);
+    getchar();
+
+    printf("Quantidade de peças:\n");
+    scanf("%d", &a.qntd_pecas);
+    getchar();
+
+    // Abrir arquivo de agendamentos para gravação
+    agendamento_file = fopen(typedoc == 1 ? "agendamento.txt" : "agendamento.bin", typedoc == 1 ? "a" : "ab");
+    if (!agendamento_file) {
+        perror("Erro ao abrir arquivo de agendamentos para escrita");
+        return -2;
+    }
+
+    if (typedoc == 1) {
+        fprintf(agendamento_file, "%d,%d,%s,%d,%s,%s,%s,%d,%d\n",
+                a.codigo, a.codigocliente, a.placaveiculo, a.servico, a.data, a.hora, a.cpf, a.peca, a.qntd_pecas);
+    } else {
+        fwrite(&a, sizeof(AGENDAMENTO), 1, agendamento_file);
+    }
+
+    fclose(agendamento_file);
+    printf("Agendamento realizado com sucesso.\n");
+
+    return 0;
+}
+
+int consulta_agendamento() {
+    // Abrindo o arquivo conforme o tipo
+    FILE *agendamento_file = fopen(typedoc == 1 ? "agendamento.txt" : "agendamento.bin", typedoc == 1 ? "r" : "rb");
+    if (!agendamento_file) {
+        perror("Erro ao abrir o arquivo de agendamentos");
+        return -2;
+    }
+
+    if (typedoc == 1) { // Arquivo texto
+        AGENDAMENTO a;
+
+        printf("Exibindo agendamentos do arquivo texto:\n");
+        printf("===========================================================================================\n");
+
+        while (fscanf(agendamento_file, "%d,%d,%19[^,],%d,%19[^,],%19[^,],%19[^,],%d,%d\n",
+                      &a.codigo, &a.codigocliente, a.placaveiculo, &a.servico, a.data, a.hora, a.cpf,&a.peca,&a.qntd_pecas) == 9) {
+            printf("Agendamento:\n");
+            printf("Código do agendamento: %d, Código do Cliente: %d, Placa do Veículo: %s, Código do Serviço: %d,\nData: %s, Hora: %s, Funcionário: %s\nPeças: %d Quantidade: %d\n",
+                   a.codigo, a.codigocliente, a.placaveiculo, a.servico, a.data, a.hora, a.cpf, a.peca, a.qntd_pecas);
+            printf("===========================================================================================\n");
+        }
+
+        fclose(agendamento_file); // Fechando o arquivo
+    } else if (typedoc == 2) { // Arquivo binário
+        AGENDAMENTO ab;
+
+        printf("Exibindo agendamentos do arquivo binário:\n");
+        printf("===========================================================================================\n");
+
+        while (fread(&ab, sizeof(AGENDAMENTO), 1, agendamento_file) == 1) {
+            printf("Agendamento:\n");
+            printf("Código do agendamento: %d, Código do Cliente: %d, Placa do Veículo: %s, Código do Serviço: %d,\nData: %s, Hora: %s, Funcionário: %s\nPeças: %d Quantidade: %d\n",
+                   ab.codigo, ab.codigocliente, ab.placaveiculo, ab.servico, ab.data, ab.hora, ab.cpf, ab.peca, ab.qntd_pecas);
+            printf("===========================================================================================\n");
+        }
+
+        fclose(agendamento_file); // Fechando o arquivo
+    } else {
+        printf("Tipo de arquivo inválido. Digite 1 para texto ou 2 para binário.\n");
+        fclose(agendamento_file); // Fechando o arquivo em caso de erro
+        return -1;
+    }
+
+    return 0; // Retorna 0 em caso de sucesso
+}
+
+int ordem_servico() {
+    FILE *agendamento_file = fopen(typedoc == 1 ? "agendamento.txt" : "agendamento.bin", typedoc == 1 ? "r" : "rb");
+    FILE *ordem_file = fopen(typedoc == 1 ? "ordem.txt" : "ordem.bin", typedoc == 1 ? "a+" : "ab");
+
+    if (!agendamento_file || !ordem_file) {
+        perror("Erro ao abrir os arquivos necessários");
+        if (agendamento_file) fclose(agendamento_file);
+        if (ordem_file) fclose(ordem_file);
+        return -2;
+    }
+
+    AGENDAMENTO agendamento;
+    ORDEM ordem;
+    int encontrado = 0;
+
+    printf("Digite o código do agendamento: ");
+    int codigo_aged;
+    scanf("%d", &codigo_aged);
+    getchar();
+
+    // Localizar o agendamento no arquivo
+    if (typedoc == 1) { // Arquivo texto
+        while (fscanf(agendamento_file, "%d,%d,%19[^,],%d,%19[^,],%19[^,],%19[^,],%d,%d\n",
+                      &agendamento.codigo, &agendamento.codigocliente, agendamento.placaveiculo, &agendamento.servico,
+                      agendamento.data, agendamento.hora, agendamento.cpf,
+                      &agendamento.peca, &agendamento.qntd_pecas) == 9) {
+            if (agendamento.codigo == codigo_aged) {
+                encontrado = 1;
+                break;
+            }
+        }
+    } else { // Arquivo binário
+        while (fread(&agendamento, sizeof(AGENDAMENTO), 1, agendamento_file) == 1) {
+            if (agendamento.codigo == codigo_aged) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
+
+    if (!encontrado) {
+        printf("Agendamento não encontrado.\n");
+        fclose(agendamento_file);
+        fclose(ordem_file);
+        return -1;
+    }
+
+    // Preencher a ordem de serviço
+    ordem.codigoservico = agendamento.servico;
+    ordem.codigopeca = agendamento.peca;
+    ordem.qntd_pecas = agendamento.qntd_pecas;
+    strcpy(ordem.veiculo, agendamento.placaveiculo);
+
+    // Obter o valor do serviço e comissão
+    FILE *servico_file = fopen(typedoc == 1 ? "servico.txt" : "servico.bin", typedoc == 1 ? "r" : "rb");
+    if (!servico_file) {
+        perror("Erro ao abrir arquivo de serviços");
+        fclose(agendamento_file);
+        fclose(ordem_file);
+        return -2;
+    }
+
+    SERVICO servico;
+    while (typedoc == 1
+           ? fscanf(servico_file, "%d,%49[^,],%f,%f\n", &servico.codigo, servico.descricao, &servico.preco, &servico.comissao) == 4 : fread(&servico, sizeof(SERVICO), 1, servico_file) == 1) {
+        if (servico.codigo == agendamento.servico) {
+            ordem.vtotal = servico.preco - (servico.preco * (servico.comissao / 100.0));
+            ordem.comissao = servico.preco - ordem.vtotal;
+            break;
+        }
+    }
+
+    fclose(servico_file);
+
+    // Coletar o maior código já utilizado
+    int codigo, mc = 0; // Inicializa mc com 0
+    if (typedoc == 1) { // Arquivo texto
+        rewind(ordem_file);
+        while (fscanf(ordem_file, "%d,%*[^,],%*d,%*d,%*d,%*d,%*f,%*f\n", &codigo) == 1) {
+            if (codigo > mc) mc = codigo;
+        }
+    } else { // Arquivo binário
+        ORDEM temp;
+        while (fread(&temp, sizeof(ORDEM), 1, ordem_file) == 1) {
+            if (temp.codigo > mc) mc = temp.codigo;
+        }
+    }
+    ordem.codigo = mc + 1; // Define o novo código
+
+    // Escrever a ordem de serviço
+    if (typedoc == 1) {
+        fprintf(ordem_file, "%d,%s,%d,%d,%d,%.2f,%.2f\n",
+                ordem.codigo, ordem.veiculo, ordem.codigoservico, ordem.codigopeca, ordem.qntd_pecas, ordem.vtotal, ordem.comissao);
+    } else {
+        fwrite(&ordem, sizeof(ORDEM), 1, ordem_file);
+    }
+
+    fclose(ordem_file);
+
+    // Reabrir o arquivo de agendamento para reescrever
+    FILE *temp_file = fopen("temp_agendamento.bin", typedoc == 1 ? "w" : "wb");
+    if (!temp_file) {
+        perror("Erro ao abrir arquivo temporário");
+        fclose(agendamento_file);
+        return -2;
+    }
+
+    rewind(agendamento_file); // Volta para o início do arquivo
+    if (typedoc == 1) { // Arquivo texto
+        while (fscanf(agendamento_file, "%d,%d,%19[^,],%d,%19[^,],%19[^,],%19[^,],%d,%d\n",
+                      &agendamento.codigo, &agendamento.codigocliente, agendamento.placaveiculo, &agendamento.servico,
+                      agendamento.data, agendamento.hora, agendamento.cpf,
+                      &agendamento.peca, &agendamento.qntd_pecas) == 9) {
+            if (agendamento.codigo != codigo_aged) {
+                fprintf(temp_file, "%d,%d,%s,%d,%s,%s,%s,%d,%d\n",
+                        agendamento.codigo, agendamento.codigocliente, agendamento.placaveiculo, agendamento.servico,
+                        agendamento.data, agendamento.hora, agendamento.cpf,
+                        agendamento.peca, agendamento.qntd_pecas);
+            }
+        }
+    } else { // Arquivo binário
+        while (fread(&agendamento, sizeof(AGENDAMENTO), 1, agendamento_file) == 1) {
+            if (agendamento.codigo != codigo_aged) {
+                fwrite(&agendamento, sizeof(AGENDAMENTO), 1, temp_file);
+            }
+        }
+    }
+
+    fclose(agendamento_file);
+    fclose(temp_file);
+
+    // Substituir o arquivo original pelo temporário
+    remove(typedoc == 1 ? "agendamento.txt" : "agendamento.bin");
+    rename("temp_agendamento.bin", typedoc == 1 ? "agendamento.txt" : "agendamento.bin");
+
+    printf("Ordem de serviço emitida e agendamento removido com sucesso!\n");
+    return 0;
+}
+
+int finalizar_ordem() {
+    FILE *ordem_file = fopen(typedoc == 1 ? "ordem.txt" : "ordem.bin", typedoc == 1 ? "r" : "rb");
+    FILE *temp_ordem = fopen(typedoc == 1 ? "ordem_temp.txt" : "ordem_temp.bin", typedoc == 1 ? "w" : "wb");
+    FILE *caixa_file = fopen(typedoc == 1 ? "caixa.txt" : "caixa.bin", typedoc == 1 ? "a" : "ab");
+
+    if (!ordem_file || !temp_ordem || !caixa_file) {
+        perror("Erro ao abrir os arquivos necessários");
+        if (ordem_file) fclose(ordem_file);
+        if (temp_ordem) fclose(temp_ordem);
+        if (caixa_file) fclose(caixa_file);
+        return -2;
+    }
+
+    printf("Digite o código da ordem que deseja finalizar: ");
+    int codigo_ordem;
+    scanf("%d", &codigo_ordem);
+    getchar();
+
+    printf("Data da finalização (dd/mm/aa): ");
+    char data[15];
+    fgets(data, sizeof(data), stdin);
+    strtok(data, "\n");
+
+    ORDEM ordem;
+    int encontrado = 0;
+
+    while (typedoc == 1
+           ? fscanf(ordem_file, "%d,%19[^,],%d,%d,%d,%f,%f\n",
+                    &ordem.codigo, ordem.veiculo, &ordem.codigoservico, &ordem.codigopeca, &ordem.qntd_pecas, &ordem.vtotal, &ordem.comissao) == 7
+           : fread(&ordem, sizeof(ORDEM), 1, ordem_file) == 1) {
+        if (ordem.codigo == codigo_ordem) {
+            encontrado = 1;
+
+            // Atualizar o caixa
+            CAIXA transacao = {ordem.vtotal, "Finalização de ordem", ""};
+            strcpy(transacao.data, data);
+
+            if (typedoc == 1) {
+                fprintf(caixa_file, "%.2f,%s,%s\n", transacao.saldo, transacao.descricao, transacao.data);
+            } else {
+                fwrite(&transacao, sizeof(CAIXA), 1, caixa_file);
+            }
+
+            // Atualizar estoque
+            int resultado_estoque = debitar_estoque(ordem.codigopeca, ordem.qntd_pecas);
+            if (resultado_estoque != 0) {
+                printf("Erro ao debitar estoque para a peça %d. Código de erro: %d\n", ordem.codigopeca, resultado_estoque);
+            }
+        } else {
+            if (typedoc == 1) {
+                fprintf(temp_ordem, "%d,%s,%d,%d,%d,%f,%f\n",
+                        ordem.codigo, ordem.veiculo, ordem.codigoservico, ordem.codigopeca, ordem.qntd_pecas, ordem.vtotal, ordem.comissao);
+            } else {
+                fwrite(&ordem, sizeof(ORDEM), 1, temp_ordem);
+            }
+        }
+    }
+
+    fclose(ordem_file);
+    fclose(temp_ordem);
+    fclose(caixa_file);
+
+    // Substituir o arquivo original
+    remove(typedoc == 1 ? "ordem.txt" : "ordem.bin");
+    rename(typedoc == 1 ? "ordem_temp.txt" : "ordem_temp.bin", typedoc == 1 ? "ordem.txt" : "ordem.bin");
+
+    if (encontrado) {
+        printf("Ordem de serviço finalizada com sucesso!\n");
+        return 0;
+    } else {
+        printf("Ordem de serviço não encontrada.\n");
+        return -1;
+    }
+}
+
+int consulta_ordens() {
+    // Abrindo o arquivo de ordens conforme o tipo
+    FILE *ordem_file = fopen(typedoc == 1 ? "ordem.txt" : "ordem.bin", typedoc == 1 ? "r" : "rb");
+    if (!ordem_file) {
+        perror("Erro ao abrir o arquivo de ordens de serviço");
+        return -2;
+    }
+
+    printf("Ordens de Serviço Ativas:\n");
+    printf("===========================================================================================\n");
+
+    if (typedoc == 1) { // Arquivo texto
+        ORDEM o;
+        while (fscanf(ordem_file, "%d,%19[^,],%d,%d,%d,%f,%f\n",
+                      &o.codigo, o.veiculo, &o.codigoservico, &o.codigopeca,
+                      &o.qntd_pecas, &o.vtotal, &o.comissao) == 7) {
+            printf("Código da ordem: %d\n", o.codigo);
+            printf("Placa do veiculo: %s\n", o.veiculo);
+            printf("Código do Serviço: %d\n", o.codigoservico);
+            printf("Código da Peça: %d\n", o.codigopeca);
+            printf("Quantidade de Peças: %d\n", o.qntd_pecas);
+            printf("Valor Total: %.2f\n", o.vtotal);
+            printf("Comissão do funcionário: %.2f\n", o.comissao);
+            printf("-------------------------------------------------------------------------------------------\n");
+        }
+    } else { // Arquivo binário
+        ORDEM ordem;
+        while (fread(&ordem, sizeof(ORDEM), 1, ordem_file) == 1) {
+            printf("Código da ordem: %d\n", ordem.codigo);
+            printf("Placa do veiculo: %s\n", ordem.veiculo);
+            printf("Código do Serviço: %d\n", ordem.codigoservico);
+            printf("Código da Peça: %d\n", ordem.codigopeca);
+            printf("Quantidade de Peças: %d\n", ordem.qntd_pecas);
+            printf("Valor Total: %.2f\n", ordem.vtotal);
+            printf("Comissão do funcionário: %.2f\n", ordem.comissao);
+            printf("-------------------------------------------------------------------------------------------\n");
+        }
+    }
+
+    fclose(ordem_file); // Fechando o arquivo
+    return 0; // Retorna 0 em caso de sucesso
+}
+
+

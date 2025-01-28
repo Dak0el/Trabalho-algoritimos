@@ -61,7 +61,7 @@ typedef struct {
 
 typedef struct {
     char nome[50];
-    char cpf[15];
+    char cpf[20];
     char cargo[50];
     float salario;
 } FUNCIONARIO;
@@ -74,7 +74,7 @@ typedef struct Caixa {
 
 typedef struct ContasReceber {
     char descricao[50];       // Descrição da conta a receber
-    char data_vencimento[11]; // Data de vencimento no formato DD/MM/AAAA
+    char data_vencimento[15]; // Data de vencimento no formato DD/MM/AAAA
     float valor;              // Valor da conta a receber
     int status;               // Status da conta (0 = Pendente, 1 = Pago)
 } CONTASR;
@@ -85,6 +85,28 @@ typedef struct ContasPagar {
     float valor;
     int status; // 0: pendente, 1: paga
 } CONTASP;
+
+typedef struct {
+    int codigo;
+    int codigocliente;
+    char placaveiculo[20];
+    int servico;
+    char data[20];
+    char hora[20];
+    char cpf[20];
+    int peca;
+    int qntd_pecas;
+}AGENDAMENTO;
+
+typedef struct {
+    int codigo;
+    char veiculo[20];
+    int codigoservico;
+    int codigopeca;
+    int qntd_pecas;
+    float vtotal;
+    float comissao;
+}ORDEM;
 
 //variaveis globais
 extern OFICINA *oficina;
@@ -145,6 +167,26 @@ int consulta_funcionarios();
 int excluir_funcionario();
 int alterar_funcionario();
 
+int entrada_nota_fiscal();
+int apply_fiscal();
+
+int registrar_transacao();
+int consultar_lancamentos();
+int exibir_saldo_atual();
+int registrar_conta_receber();
+int consultar_contas_receber();
+int baixar_conta_receber();
+int registrar_conta_pagar();
+int consultar_contas_pagar();
+
+int verificar_concorrencia(char *cpf_funcionario, char *data, char *hora);
+int debitar_estoque(int codigo_peca, int quantidade);
+int agendamento();
+int consulta_agendamento();
+int ordem_servico();
+int finalizar_ordem();
+int consulta_ordens();
+
 //funções de escrita
 
 int copy_element();
@@ -159,5 +201,8 @@ void print_fornecedor (FORNECEDOR f);
 void print_servico (SERVICO s);
 void print_funcionario (FUNCIONARIO f);
 void print_saldo (float x);
+void print_contasreceber(CONTASR c);
+
+
 
 #endif // CADASTRO_H

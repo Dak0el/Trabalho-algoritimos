@@ -14,7 +14,8 @@ int menu() {
     int op=0,cod,x;
 
     while (1) {
-        printf("________________Menu________________\n");
+
+        printf("\n________________Menu________________\n");
         printf("Digite o número da operação que deseja fazer:\n");
         printf("|1-Cadastro\n");
         printf("|2-Consulta\n");
@@ -25,6 +26,7 @@ int menu() {
         printf("|7-Trocar modo de leitura, modo atual: %s\n", typedoc == 1 ? "Texto" : "Binário");
         printf("|8-Nota fiscal\n");
         printf("|9-Caixa\n");
+        printf("|10-Agendamento\n");
         printf("Escolha: ");
         scanf("%d", &op);
         getchar();
@@ -679,7 +681,7 @@ case 8:
                     }
         cod = apply_fiscal();
                     if(cod == 0){
-                        printf("Nota feita com sucesso.\n");
+                        printf("Estoque atualizado.\n");
                     }else if(cod == 1){
                         printf("Cadastro não encontrado.\n");
                     }else if(cod == -2){
@@ -693,7 +695,7 @@ break;
 
 case 9:
 caixa:
-        printf("CAIXA\n");
+        printf("\nCAIXA\n");
          printf("1-Controle de Caixa\n");
          printf("2-Contas a Receber\n");
          printf("3-Contas a Pagar\n");
@@ -786,9 +788,9 @@ caixa:
                             }
                             break;
                         case 2: // Consultar contas a receber
-                            cod = consultar_contas_receber();
                             printf("Contas a Receber:\n");
                             printf("Descrição\tValor\tVencimento\tStatus\n");
+                            cod = consultar_contas_receber();
                             if (cod == 0) {
                                 printf("Consulta realizada com sucesso!\n");
                             } else if (cod == -2) {
@@ -888,6 +890,43 @@ caixa:
             break;
              }
         break;
+            case 10:
+                        do {
+                printf("AGENDAMENTO\n");
+                printf("1 - Registrar Agendamento\n");
+                printf("2 - Consultar Agendamentos\n");
+                printf("3 - Ordem de Serviço\n");
+                printf("4 - Finalizar Ordem de Serviço\n");
+                printf("5 - Consultar Ordens de Serviços\n");
+                printf("0 - Sair\n");
+                printf("Escolha uma opção: ");
+                scanf("%d", &op);
+                getchar(); // Limpa o buffer
+                printf("\n");
+
+                        switch (op) {
+                            case 1: // Registrar uma nova conta a pagar
+                                agendamento();
+                            case 2: // Consultar contas a pagar
+                                consulta_agendamento();
+                                break;
+                            case 3:
+                                ordem_servico();
+                                break;
+                            case 4:
+                                finalizar_ordem();
+                                break;
+                            case 5:
+                                consulta_ordens();
+                                break;
+                            case 0:
+                                break;
+                            default:
+                                printf("Opção inválida. Tente novamente.\n");
+                                break;
+                        }
+                    } while (op != 0);
+                break;
             default:
                 printf("Opção inválida.\n");
     break;
@@ -974,10 +1013,6 @@ void print_funcionario(FUNCIONARIO f){
 void print_saldo(float x){
     printf("Saldo:%.2f\n",x);
     return;
-}
-
-void pna(char x[50]){//produto nao achado
-     printf("Produto '%s' não encontrado no arquivo fiscal.\n", x);
 }
 
 void print_contasreceber(CONTASR c){
